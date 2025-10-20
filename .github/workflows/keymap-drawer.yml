@@ -1,0 +1,22 @@
+name: "Draw Keymap"
+on:
+ workflow_dispatch:  # can be triggered manually
+  push:               # automatically run on changes to following paths
+    paths:
+      - "config/drift.keymap"
+      - "keymap_drawer.config.yaml"
+      - "config/boards/shields/drift/drift.dtsi"
+
+jobs:
+  draw:
+    uses: caksoylar/keymap-drawer/.github/workflows/draw-zmk.yml@main
+    permissions:
+      contents: write
+    with:
+      commit_message: "[Draw] ${{ github.event.head_commit.message || 'Updated keymap drawing' }}"
+      amend_commit: false
+      keymap_patterns: "config/*.keymap"
+      json_path: "config"
+      config_path: "keymap_drawer.config.yaml" # config file, ignored if not exists
+      output_folder: "keymap-drawer"
+      destination: "both"
