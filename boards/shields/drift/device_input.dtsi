@@ -1,0 +1,24 @@
+/*
+   Ref: https://zmk.dev/docs/development/hardware-integration/pointing
+   The listener node is included so keymaps and input processors can 
+   reference it safely, even if the device is not active yet. This 
+   prevents compilation errors due to missing nodes.
+*/
+
+/{
+    split_inputs {  // container for all split input devices
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        trackball_split_input: trackball_split_input@0 {  // logical input for trackball
+            compatible = "zmk,input-split";
+            reg = <0>;  // unique identifier on this bus
+        };
+    };
+
+    trackball_split_listener: trackball_split_listener {  // interface to monitor split input
+        compatible = "zmk,input-listener";        
+        device = <&trackball_split_input>;  // link to the trackball split input node
+		status = "disabled";  // not active by default, safe for keymaps
+    };
+};

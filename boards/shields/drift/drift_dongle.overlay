@@ -1,0 +1,105 @@
+// Copyright (c) 2025 The ZMK Contributors
+// SPDX-License-Identifier: MIT
+
+#include "drift.dtsi"
+#include "device_input.dtsi"
+#include <input/processors.dtsi>
+#include <dt-bindings/zmk/input_transform.h>
+#include <dt-bindings/zmk/matrix_transform.h>
+#include <behaviors/input_gestures_accel.dtsi>
+
+&default_transform {
+    col-offset = <7>;
+};
+
+&pointer_accel { // this needs to be put BEFORE input-listener
+    input-type = <INPUT_EV_REL>;
+    codes = <INPUT_REL_X INPUT_REL_Y>;
+    
+	// Example values (commented out, not active):
+	//sensitivity = <800>;          // 0.8x base sensitivity
+	//min-factor = <800>;           // 0.8x minimum for precision
+    //max-factor = <3000>;          // 3.0x maximum acceleration
+    //acceleration-exponent = <1>;  // Linear acceleration (1 = none, up to 5 = aggressive)
+    //y-boost = <1100>;             // 1.1x Y-axis boost
+    //speed-threshold = <900>;      // Acceleration starts at ~57 mm/s
+    //speed-max = <1800>;           // Acceleration caps at ~114 mm/s
+    //min-factor = <1000>;          // 1.0x minimum (no slowdown)
+	//sensor-dpi = <600>;           // For reference only
+
+	// Level 1 & 2 Common Settings - office_trackball (400 DPI hardware)
+	sensitivity = <500>;        // 1.5x base sensitivity (compensates for low DPI)
+	max-factor = <1200>;        // Up to 2.0x acceleration
+	curve-type = <0>;           // Mild curve (default linear-ish)
+	y-boost = <1100>;           // 1.1x Y-axis boost (helps widescreen use)
+	sensor-dpi = <800>;         // Effective DPI setting (matches 400 DPI hardware ×2)
+
+	// Level 2 Additional Settings
+	speed-threshold = <1000>;   // Acceleration begins at ~64 mm/s
+	speed-max = <2000>;         // Acceleration caps at ~127 mm/s
+	min-factor = <600>;         // ~0.95x minimum (slight slowdown for precision)
+	acceleration-exponent = <1>; // Linear acceleration curve
+};
+
+/ {
+  /* temp-layer instance to set an idle guard */
+  am_temp_layer: zip_temp_layer {
+    compatible = "zmk,input-processor-temp-layer";
+    #input-processor-cells = <2>;   /* args: <layer timeout_ms> */
+    require-prior-idle-ms = <500>;  /* time before automouse can activate after last keypress, try 150–300 to taste */
+  };
+};
+
+
+&trackball_split_listener { // local trackball input split device child node, receiving events from the peripheral and raising them locally
+	status = "okay";
+    	input-processors = 
+		    <&pointer_accel>,
+			<&am_temp_layer 4 1200>;   /* <- guarded automouse: layer 4 for 1.5s */
+	scroll {
+		layers = <5 7>; // SCROLL
+		input-processors =
+            <&zip_xy_transform (INPUT_TRANSFORM_Y_INVERT)>,
+            <&zip_xy_scaler 1 16>,
+            <&zip_xy_to_scroll_mapper>;
+	};	
+};
+
+
+/ {
+    chosen {
+        zmk,kscan = &mock_kscan;
+		zmk,physical-layout = &drift_7col_layout;
+		zephyr,display = &oled;
+    };
+		
+    mock_kscan: kscan_1 {
+        compatible = "zmk,kscan-mock";
+        columns = <0>;
+        rows = <0>;
+        events = <0>;
+    };
+};
+
+
+&pro_micro_i2c {
+    status = "okay";
+    oled: ssd1306@3c {
+        compatible = "solomon,ssd1306fb";
+        reg = <0x3c>;
+        width = <128>;
+        height = <64>;
+        segment-offset = <0>;
+        page-offset = <0>;
+        display-offset = <0>;
+        multiplex-ratio = <63>;
+		
+		// Responsible for oled invert
+        segment-remap;
+        com-invdir;
+
+        //com-sequential;
+        inversion-on;
+        prechargep = <0x22>;
+    };
+};

@@ -1,0 +1,56 @@
+// Copyright (c) 2025 The ZMK Contributors
+// SPDX-License-Identifier: MIT
+
+#include "drift.dtsi"
+#include "trackball.dtsi"                     // Trackball sensor configuration
+#include "device_input.dtsi"                  // Split input handling (trackball, encoders, etc.)
+#include <dt-bindings/zmk/input_transform.h>
+
+// Apply default transform with a column offset (shifts matrix alignment)
+&default_transform {
+	col-offset = <7>;
+};
+
+// Enable SPI1 bus (required for PMW3610 trackball)
+&spi1 {
+    status = "okay";
+};
+
+// Define the local *split input* trackball child node
+// This lets the split firmware know the trackball belongs to this side
+&trackball_split_input {
+	device = <&trackball>;
+};
+
+
+/ {
+	chosen {
+		zmk,kscan = &kscan0;
+	};
+
+	kscan0: kscan {
+		compatible = "zmk,kscan-gpio-matrix";		
+		diode-direction = "col2row";           // Current flows from column → row
+		wakeup-source;                         // Allow wake from sleep on key press
+		
+		// Column pins (C0–C6)
+		col-gpios
+			= <&pro_micro 16 GPIO_ACTIVE_HIGH>
+			, <&pro_micro 10 GPIO_ACTIVE_HIGH>
+			, <&pro_micro 9 GPIO_ACTIVE_HIGH>
+			, <&pro_micro 8 GPIO_ACTIVE_HIGH>
+			, <&pro_micro 7 GPIO_ACTIVE_HIGH>
+			, <&pro_micro 6 GPIO_ACTIVE_HIGH>
+			, <&pro_micro 5 GPIO_ACTIVE_HIGH>
+			;
+		
+		// Row pins (R0–R4) with pull-downs
+		row-gpios
+            = <&pro_micro 20 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&pro_micro 19 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&pro_micro 18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&pro_micro 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&pro_micro 14 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            ;
+	};
+};
