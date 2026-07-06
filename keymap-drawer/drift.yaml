@@ -1,7 +1,7 @@
 layout: {zmk_keyboard: drift}
 layers:
   base: [ESC, '`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', Ctl+C, TAB, Q, '&kpws W', E, R, T, Y, U, I, O, P, '[', ']', LGUI, CAPS, '&kpad A',
-    '&kpws S', '&kpad D', F, G, H, J, K, L, ;, '''', ENTER, LCTRL, LALT, Z, X, C, V, B, Ctl+V, \, N, M, ',', ., /, BACKSPACE, DEL, LSHFT, SPACE, lower, raise, SPACE]
+    '&kpws S', '&kpad D', F, G, H, J, K, L, ;, '''', ENTER, LCTRL, LALT, Z, X, C, V, B, Ctl+V, \, N, M, ',', ., /, BACKSPACE, DEL, LSHFT, ENTER, lower, raise, SPACE]
   lower:
   - ESC
   - '`'
