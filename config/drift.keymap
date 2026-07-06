@@ -100,7 +100,7 @@
                 &kp LC(C)  &kp TAB   &kp Q    &kpws W  &kp E     &kp R     &kp T                        &kp Y     &kp U     &kp I     &kp O   &kp P    &kp LBKT      &kp RBKT
                 &kp LGUI   &kp CAPS  &kpad A  &kpws S  &kpad D   &kp F     &kp G                        &kp H     &kp J     &kp K     &kp L   &kp SEMI &kp SQT       &kp ENTER
                 &kp LCTRL  &kp LALT  &kp Z    &kp X    &kp C     &kp V     &kp B     &kp LC(V) &kp BSLH &kp N     &kp M     &kp COMMA &kp DOT &kp FSLH &kp BACKSPACE &kp DEL
-                                                       &kp LSHFT &kp SPACE &mo LOWER                    &mo RAISE &kp SPACE
+                                                       &kp LSHFT &kp ENTER &mo LOWER                    &mo RAISE &kp SPACE
             >;
             sensor-bindings = <&enc_scroll SCRL_DOWN SCRL_UP>;
         };
